@@ -1,23 +1,24 @@
 class Solution {
- public:
-  int divide(int dividend, int divisor) {
-    // -2^{31} / -1 = 2^31 will overflow, so return 2^31 - 1.
-    if (dividend == INT_MIN && divisor == -1)
-      return INT_MAX;
+public:
+    int divide(int dividend, int divisor) {
+        if (dividend == INT_MIN && divisor == -1)
+            return INT_MAX;
 
-    const int sign = dividend > 0 ^ divisor > 0 ? -1 : 1;
-    long ans = 0;
-    long dvd = labs(dividend);
-    long dvs = labs(divisor);
+        long long dvd = llabs((long long)dividend);
+        long long dvs = llabs((long long)divisor);
+        long long ans = 0;
 
-    while (dvd >= dvs) {
-      long k = 1;
-      while (k * 2 * dvs <= dvd)
-        k *= 2;
-      dvd -= k * dvs;
-      ans += k;
+        for (int i = 31; i >= 0; i--) {
+            if (dvd >= (dvs << i)) {
+                ans += (1LL << i);
+                dvd -= (dvs << i);
+            }
+        }
+
+        // apply sign
+        if ((dividend > 0) ^ (divisor > 0))
+            ans = -ans;
+
+        return (int)ans;
     }
-
-    return sign * ans;
-  }
 };
