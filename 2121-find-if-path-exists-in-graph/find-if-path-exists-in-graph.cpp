@@ -1,35 +1,43 @@
 class Solution {
 public:
-    bool dfs(int node, int destination, vector<vector<int>>& adj, vector<bool>& visited)
+    vector<int> parent, rank;
+
+    int find(int x)
     {
-        if(node==destination)
-        {
-            return true;
-        }
-        visited[node] = true;
-        for(int neighbor : adj[node])
-        {
-            if(!visited[neighbor])
-            {
-                if(dfs(neighbor,destination, adj, visited))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
+        if (parent[x] == x)
+            return x;
+
+        return parent[x] = find(parent[x]);
+    }
+
+    void unite(int x, int y)
+    {
+        int rootX = find(x);
+        int rootY = find(y);
+
+        if (rootX == rootY)
+            return;
+
+        if (rank[rootX] < rank[rootY])
+            swap(rootX, rootY);
+
+        parent[rootY] = rootX;
+
+        if (rank[rootX] == rank[rootY])
+            rank[rootX]++;
     }
     bool validPath(int n, vector<vector<int>>& edges, int source, int destination) {
-        vector<vector<int>> adj(n);
-        for(auto &edge : edges)
+        parent.resize(n);
+        rank.resize(n,1);
+        for(int i=0;i<n;i++)
         {
-            int u = edge[0];
-            int v = edge[1];
-            adj[u].push_back(v);
-            adj[v].push_back(u);
+            parent[i]=i;
+
         }
-        vector<bool> visited( n,false);
-        return dfs(source, destination, adj ,visited);
-        
+        for(auto x:edges){
+            unite(x[0],x[1]);
+        }
+        return find(source) ==find(destination);
+
     }
 };
